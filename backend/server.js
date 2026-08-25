@@ -1,6 +1,7 @@
 import express, { text } from "express"
 import cors from "cors"
 
+let taskId = 4;
 
 let tasks = [
   { id: 1, title: 'Buy groceries', done: false },
@@ -51,6 +52,28 @@ app.get("/tasks/:id", (req, res) => {
     }
 
     res.json(task);
+
+})
+
+
+app.post("/tasks", (req, res) => {
+    const {title} = req.body;
+
+    if(!title || title.trim() === ''){
+        res.status(404).json({error: "Bad Request"})
+    }
+
+    let task = {
+        id: taskId++,
+        title: title,
+        done: false
+    }
+
+    tasks.push(task)
+
+    res.status(201).json(task);
+
+
 
 })
 
