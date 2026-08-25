@@ -20,6 +20,15 @@ app.listen(port, () => {
 
 
 app.get("/", (req, res) => {
-    res.json({message: "hello-server"})
+    res.json({
+        "name": "Task API",
+        "version": "1.0",
+        "endpoints": ["/tasks"]
+    })
 })
+
+app.get("/health", (_, res) => {
+    res.status(200).json({"status": "ok"})
+})
+
 
