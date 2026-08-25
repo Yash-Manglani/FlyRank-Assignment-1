@@ -77,3 +77,54 @@ app.post("/tasks", (req, res) => {
 
 })
 
+
+app.put("/tasks/:id", (req, res) => {
+
+    const taskId = parseInt(req.params.id);
+    const task = tasks.find(t => t.id === taskId);
+    if(!task){
+        return res.status(404).json({error: "Invalid Id"});
+        
+    } 
+        
+
+    const {title, done} = req.body;
+
+    if (title === undefined && done === undefined) {
+        return res.status(400).json({ error: 'Must provide title or done to update' });
+    }
+
+    if (title !== undefined) {
+    if (typeof title !== 'string' || title.trim() === '') {
+      return res.status(400).json({ error: 'Title cannot be empty' });
+    }
+    task.title = title;
+  }
+
+
+  if (done !== undefined) {
+    if (typeof done !== 'boolean') {
+      return res.status(400).json({ error: 'done must be a boolean (true/false)' });
+    }
+    task.done = done;
+  }
+
+  res.json(task);
+    
+
+});
+
+app.delete("/tasks/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const taskIndex = tasks.findIndex(t => t.id === id);
+
+    if(taskIndex < 0){
+        return res.status(404).json({error: "Id not found"});
+    }
+
+    tasks.splice(taskIndex, 1);
+
+    res.status(204).send();
+
+});
+
