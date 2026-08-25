@@ -1,5 +1,12 @@
-import express from "express"
+import express, { text } from "express"
 import cors from "cors"
+
+
+let tasks = [
+  { id: 1, title: 'Buy groceries', done: false },
+  { id: 2, title: 'Walk the dog', done: true },
+  { id: 3, title: 'Finish Node.js assignment', done: false }
+];
 
 
 const app = express();
@@ -31,4 +38,19 @@ app.get("/health", (_, res) => {
     res.status(200).json({"status": "ok"})
 })
 
+app.get("/tasks", (_, res) => {
+    res.json(tasks);
+})
+
+app.get("/tasks/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    const task = tasks.find(t => t.id === id)
+
+    if(!task){
+        res.status(404).json({error: `Task ${id} not found`});
+    }
+
+    res.json(task);
+
+})
 
