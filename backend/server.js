@@ -1,5 +1,9 @@
 import express, { text } from "express"
 import cors from "cors"
+import swaggerUi from "swagger-ui-express";
+import fs from 'fs';
+
+const swaggerDocument = JSON.parse(fs.readFileSync("../openapi.json", "utf-8"));
 
 let taskId = 4;
 
@@ -26,6 +30,7 @@ app.listen(port, () => {
     console.log(`Server is listening on port: ${port}`);
 })
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
     res.json({
