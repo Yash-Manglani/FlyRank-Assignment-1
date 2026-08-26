@@ -1,5 +1,6 @@
 import express, { text } from "express"
 import cors from "cors"
+import dotenv from "dotenv"
 import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 
