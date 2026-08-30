@@ -5,7 +5,7 @@ It fetches all the tasks, creates a task and adds it to the list, can fetch a si
 
 To run this:
 bash:
-npm install && npm start/node ./server.js
+npm install && "npm start" or "node ./server.js"
 
 Curl: 
 curl -X 'GET' \
@@ -19,3 +19,12 @@ curl -X 'GET' \
 
 <img width="1912" height="781" alt="image" src="https://github.com/user-attachments/assets/85e7ac49-e4b3-41e9-a62c-7a9af1698779" />
 
+#WHY SQLITE WAS CHOSEN
+
+It was chosen because it only requires a single file, works as a standard database (retains data after restart), and requires no additional setup. 
+
+#WHERE DATA LIVES
+
+Data lives in "tasks.db". It is a locally created SQLITE file. It is created automatically on the first startup. 
+
+![DB BROWSER](image.png)
