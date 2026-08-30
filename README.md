@@ -27,4 +27,4 @@ It was chosen because it only requires a single file, works as a standard databa
 
 Data lives in "tasks.db". It is a locally created SQLITE file. It is created automatically on the first startup. 
 
-![DB BROWSER](image.png)
+<img width="632" height="577" alt="image" src="https://github.com/user-attachments/assets/ba268b16-d98c-49be-9560-7c0df78d27ca" />
