@@ -77,64 +77,51 @@ app.post("/tasks", (req, res) => {
     };
 
     res.json(newTask);
-   
-
-    
-
-    res.status(201).json(task);
-
-
 
 })
 
 
 app.put("/tasks/:id", (req, res) => {
 
-    const taskId = parseInt(req.params.id);
-    const task = tasks.find(t => t.id === taskId);
-    if(!task){
-        return res.status(404).json({error: "Invalid Id"});
-        
-    } 
-        
+    const taskId = req.params.id;
 
     const {title, done} = req.body;
 
     if (title === undefined && done === undefined) {
-        return res.status(400).json({ error: 'Must provide title or done to update' });
+        return res.status(400).json({ error: 'Invalid Body' });
     }
 
     if (title !== undefined) {
     if (typeof title !== 'string' || title.trim() === '') {
-      return res.status(400).json({ error: 'Title cannot be empty' });
+      return res.status(400).json({ error: 'Invalid Body' });
     }
-    task.title = title;
-  }
 
+    const result = db.prepare("UPDATE tasks SET title = ?, done = ? WHERE id = ?").run(title, done, taskId);
 
-  if (done !== undefined) {
-    if (typeof done !== 'boolean') {
-      return res.status(400).json({ error: 'done must be a boolean (true/false)' });
+    if(result.changes === 0){
+        res.status(404).json({error: "task not found"});
     }
-    task.done = done;
-  }
 
-  res.json(task);
+    res.status(200).json({
+        id: Number(taskId),
+        title,
+        done
+    });
+
     
+  }
+
 
 });
 
 app.delete("/tasks/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const taskIndex = tasks.findIndex(t => t.id === id);
+    const id = req.params.id;
+    const info = db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
 
-    if(taskIndex < 0){
-        return res.status(404).json({error: "Id not found"});
+    if(info.changes === 0){
+        res.status(404).json({error: "task not found"});
     }
 
-    tasks.splice(taskIndex, 1);
-
-    res.status(204).send();
-
+    res.status(200).send();
 });
 
