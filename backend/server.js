@@ -8,11 +8,6 @@ const swaggerDocument = JSON.parse(fs.readFileSync("../openapi.json", "utf-8"));
 
 let taskId = 4;
 
-let tasks = [
-  { id: 1, title: 'Buy groceries', done: false },
-  { id: 2, title: 'Walk the dog', done: true },
-  { id: 3, title: 'Finish Node.js assignment', done: false }
-];
 
 
 const app = express();
@@ -46,12 +41,16 @@ app.get("/health", (_, res) => {
 })
 
 app.get("/tasks", (_, res) => {
+    
+    const tasks = db.prepare("SELECT * FROM tasks").all();
     res.json(tasks);
 })
 
 app.get("/tasks/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const task = tasks.find(t => t.id === id)
+    const id = req.params.id;
+    const task = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id);    
+
+    
 
     if(!task){
         res.status(404).json({error: `Task ${id} not found`});
