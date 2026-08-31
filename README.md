@@ -19,12 +19,19 @@ curl -X 'GET' \
 
 <img width="1912" height="781" alt="image" src="https://github.com/user-attachments/assets/85e7ac49-e4b3-41e9-a62c-7a9af1698779" />
 
-#WHY SQLITE WAS CHOSEN
+# WHY SQLITE WAS CHOSEN
 
 It was chosen because it only requires a single file, works as a standard database (retains data after restart), and requires no additional setup. 
 
-#WHERE DATA LIVES
+# WHERE DATA LIVES
 
 Data lives in "tasks.db". It is a locally created SQLITE file. It is created automatically on the first startup. 
 
 <img width="632" height="577" alt="image" src="https://github.com/user-attachments/assets/ba268b16-d98c-49be-9560-7c0df78d27ca" />
+
+# Database Setup (PostgreSQL)
+
+To start the PostgreSQL database container with persistent data:
+
+```bash
+docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks -p 5432:5432 -v taskdata:/var/lib/postgresql/data -d postgres
