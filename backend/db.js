@@ -1,32 +1,55 @@
-import Database from "better-sqlite3"; 
-
-const db = new Database("tasks.db");
-
-db.exec(`
-    CREATE TABLE IF NOT EXISTS tasks(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        done INTEGER DEFAULT 0
-
-    )
-    `);
+import Database from "better-sqlite3";
+import dotenv from "dotenv";
+import pg from 'pg'
+// const {Pool} = require('pg');
+dotenv.config();
 
 
-const countResult = db.prepare("SELECT COUNT(*) AS count FROM tasks").get();
+const {Pool} = pg;
 
-if(countResult.count === 0){
-    const insertTask = db.prepare("INSERT INTO tasks (title, done) VALUES(?, ?)");
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
 
-    const seed = db.transaction(() => {
-        insertTask.run("Learn SQL", 0);
-        insertTask.run("Read Documentation", 0);
-        insertTask.run("Prepare database", 1);
-    });
+});
 
-    seed();
-    console.log("Database seeded with data");
-    
+async function initDB(){
+    const client = await pool.connect();
+    try {
+        
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS tasks(
+            id SERIAL PRIMARY KEY ,
+            title TEXT NOT NULL,
+            done BOOLEAN DEFAULT FALSE
+            );
+        `)
 
+        const {rows} = await client.query("SELECT COUNT(*) FROM tasks");
+
+        const count = parseInt(rows[0].count, 10);
+        if(count === 0){
+            
+            await client.query(`
+                INSERT INTO tasks (title, done)
+                VALUES
+                    ('Buy groceries', false),
+                    ('Learn PostgreSQL with Node.js', false),
+                    ('Build backend API', true);
+            `)
+            console.log("Database seeded with data");
+
+        }
+
+    } 
+    catch (error) {
+        console.error("Error initializing POSTGRESQL Database: ", error);
+        
+    } finally{
+        client.release;
+    }
 }
 
-export default db;
+initDB();
+
+
+export default pool;

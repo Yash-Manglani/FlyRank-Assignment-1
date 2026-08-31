@@ -2,7 +2,7 @@ import express, { text } from "express"
 import cors from "cors"
 import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
-import db from "./db.js";
+import pool from "./db.js";
 
 const swaggerDocument = JSON.parse(fs.readFileSync("../openapi.json", "utf-8"));
 
