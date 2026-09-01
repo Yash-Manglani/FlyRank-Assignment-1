@@ -70,67 +70,78 @@ app.get("/tasks/:id", async (req, res) => {
 })
 
 
-app.post("/tasks", (req, res) => {
-    const {title} = req.body;
+app.post("/tasks", async (req, res) => {
 
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-        return res.status(400).json({ error: 'Title is required' });
+    try {
+        
+        const {title, done} = req.body;
+        
+        if (!title || typeof title !== 'string' || title.trim() === '') {
+            return res.status(400).json({ error: 'Title is required' });
+        }
+        if(done !== false && done !== true){
+            return res.status(400).json({error: "'Done' should be boolean (true/false)"});
+        }
+        
+        const result = await pool.query('INSERT INTO tasks (title, done) VALUES($1, $2) RETURNING *', [title, false]);
+        
+        return res.status(201).json(result.rows[0]);
+        
+    } catch (error) {
+        res.status(500).json({error: error.message});   
     }
-
-    
-
-    const newTask = {
-        id: Number(info.lastInsertRowid),
-        title: title.trim(),
-        done: 0
-    };
-
-    res.json(newTask);
 
 })
 
 
-app.put("/tasks/:id", (req, res) => {
+app.put("/tasks/:id", async (req, res) => {
 
-    const taskId = req.params.id;
+    try {
+        
+        const id = req.params.id;
+        
+        const {title, done} = req.body;
+        
+        if (!title || typeof title !== 'string' || title.trim() === '') {
+            return res.status(400).json({ error: 'Title is required' });
+        }
+        
 
-    const {title, done} = req.body;
+        const doneVal = Boolean(done);
 
-    if (title === undefined && done === undefined) {
-        return res.status(400).json({ error: 'Invalid Body' });
+        if(doneVal !== true && doneVal !== false) return res.json({error: error.message});
+        
+        const result = await pool.query('UPDATE tasks SET title = $1, done = $2 WHERE id = $3 RETURNING *', [title, doneVal, id]);
+
+        if(result.rowCount === 0){
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        res.json(result.rows[0]);
+        
+        
+    } catch (error) {
+       res.status(500).json({error: error.message});  
     }
-
-    if (title !== undefined) {
-    if (typeof title !== 'string' || title.trim() === '') {
-      return res.status(400).json({ error: 'Invalid Body' });
-    }
-
-    const result = db.prepare("UPDATE tasks SET title = ?, done = ? WHERE id = ?").run(title, done, taskId);
-
-    if(result.changes === 0){
-        res.status(404).json({error: "task not found"});
-    }
-
-    res.status(200).json({
-        id: Number(taskId),
-        title,
-        done
-    });
-
-    
-  }
 
 
 });
 
-app.delete("/tasks/:id", (req, res) => {
-    const id = req.params.id;
-    const info = db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
+app.delete("/tasks/:id", async (req, res) => {
 
-    if(info.changes === 0){
-        res.status(404).json({error: "task not found"});
+    try {
+        
+        const id = req.params.id;
+        const result = await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
+        
+        if(result.rowCount === 0){
+            res.status(404).json({error: 'Task not found'});
+        }
+        
+        res.status(204).send();
+    
+    } catch (error) {
+        res.status(500).json({error: error.message});  
     }
-
-    res.status(200).send();
 });
 
