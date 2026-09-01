@@ -1,11 +1,10 @@
-import Database from "better-sqlite3";
+
 import dotenv from "dotenv";
-import pg from 'pg'
-// const {Pool} = require('pg');
+import pkg from 'pg'
 dotenv.config();
 
 
-const {Pool} = pg;
+const {Pool} = pkg;
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -45,7 +44,7 @@ async function initDB(){
         console.error("Error initializing POSTGRESQL Database: ", error);
         
     } finally{
-        client.release;
+        client.release();
     }
 }
 

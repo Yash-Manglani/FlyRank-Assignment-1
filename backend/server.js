@@ -7,7 +7,10 @@ import { error } from "console";
 
 const swaggerDocument = JSON.parse(fs.readFileSync("../openapi.json", "utf-8"));
 
-
+const openapiDocument = JSON.parse(
+  fs.readFileSync(new URL('../openapi.json', import.meta.url))
+);
+// or fs.readFileSync('../openapi.json', 'utf8')
 
 
 const app = express();
