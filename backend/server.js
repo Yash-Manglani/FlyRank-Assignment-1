@@ -3,10 +3,10 @@ import cors from "cors"
 import swaggerUi from "swagger-ui-express";
 import fs from 'fs';
 import pool from "./db.js";
+import { error } from "console";
 
 const swaggerDocument = JSON.parse(fs.readFileSync("../openapi.json", "utf-8"));
 
-let taskId = 4;
 
 
 
@@ -40,23 +40,32 @@ app.get("/health", (_, res) => {
     res.status(200).json({"status": "ok"})
 })
 
-app.get("/tasks", (_, res) => {
+app.get("/tasks", async (_, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM tasks');
+        res.json(result.rows);
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
     
-    const tasks = db.prepare("SELECT * FROM tasks").all();
-    res.json(tasks);
 })
 
-app.get("/tasks/:id", (req, res) => {
-    const id = req.params.id;
-    const task = db.prepare(`SELECT * FROM tasks WHERE id = ?`).get(id);    
+app.get("/tasks/:id", async (req, res) => {
 
-    
-
-    if(!task){
-        res.status(404).json({error: `Task ${id} not found`});
+    try {
+        
+        const id = req.params.id;
+        const result = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
+        if(result.rowCount === 0){
+            return res.status(404).json({error: "Task not found"});
+        }
+        
+        res.json(result.rows[0]);
+        
+    } catch (error) {
+        res.status(500).json({error: error.message});        
     }
-
-    res.json(task);
 
 })
 
@@ -68,7 +77,7 @@ app.post("/tasks", (req, res) => {
         return res.status(400).json({ error: 'Title is required' });
     }
 
-    const info = db.prepare("INSERT INTO tasks (title, done) VALUES (?, ?)").run(title.trim(), 0);
+    
 
     const newTask = {
         id: Number(info.lastInsertRowid),
