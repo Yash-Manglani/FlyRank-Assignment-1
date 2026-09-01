@@ -35,3 +35,24 @@ To start the PostgreSQL database container with persistent data:
 
 ```bash
 docker run --name taskdb -e POSTGRES_PASSWORD=dev -e POSTGRES_DB=tasks -p 5432:5432 -v taskdata:/var/lib/postgresql/data -d postgres
+
+
+# Task Management REST API
+
+A containerized CRUD REST API for managing tasks built with Node.js, Express, and PostgreSQL.
+
+---
+
+## Quick Start (One Command)
+
+### 1. Environment Setup
+Copy the example environment configuration:
+```bash
+cp backend/.env.example backend/.env
+
+# One-Line Start
+
+docker compose up --build
+
+#API
+http://localhost:3000/tasks
